@@ -163,6 +163,103 @@ Assert-Test "SQLi/Bypass Prevention - Strip malicious verify serial codes" {
     }
 }
 
+# 13. Booking Match Not Found (404)
+Assert-Test "POST /api/bookings - Return 404 when match is not found" {
+    $body = @{
+        matchId = "invalid-match-999"
+        holderName = "Jane Doe"
+        category = 1
+        qty = 1
+    } | ConvertTo-Json -Compress
+    try {
+        $res = Invoke-WebRequest -UseBasicParsing -Uri "$baseUrl/api/bookings" -Method Post -Body $body -ContentType "application/json"
+        return $false
+    } catch {
+        $status = $_.Exception.Response.StatusCode
+        return ($status -eq "NotFound")
+    }
+}
+
+# 14. Booking Insufficient Seats (400)
+Assert-Test "POST /api/bookings - Return 400 when seats are insufficient" {
+    $body = @{
+        matchId = "m1"
+        holderName = "Jane Doe"
+        category = 1
+        qty = 999999
+    } | ConvertTo-Json -Compress
+    try {
+        $res = Invoke-WebRequest -UseBasicParsing -Uri "$baseUrl/api/bookings" -Method Post -Body $body -ContentType "application/json"
+        return $false
+    } catch {
+        $status = $_.Exception.Response.StatusCode
+        return ($status -eq "BadRequest")
+    }
+}
+
+# 15. Booking Missing Parameters (400)
+Assert-Test "POST /api/bookings - Return 400 when parameters are missing" {
+    $body = @{
+        matchId = "m1"
+        qty = 1
+    } | ConvertTo-Json -Compress
+    try {
+        $res = Invoke-WebRequest -UseBasicParsing -Uri "$baseUrl/api/bookings" -Method Post -Body $body -ContentType "application/json"
+        return $false
+    } catch {
+        $status = $_.Exception.Response.StatusCode
+        return ($status -eq "BadRequest")
+    }
+}
+
+# 16. Verification Missing Serial (400)
+Assert-Test "POST /api/tickets/verify - Return 400 when serial is missing" {
+    $body = @{ } | ConvertTo-Json -Compress
+    try {
+        $res = Invoke-WebRequest -UseBasicParsing -Uri "$baseUrl/api/tickets/verify" -Method Post -Body $body -ContentType "application/json"
+        return $false
+    } catch {
+        $status = $_.Exception.Response.StatusCode
+        return ($status -eq "BadRequest")
+    }
+}
+
+# 17. Chat Missing Message (400)
+Assert-Test "POST /api/chat - Return 400 when message is missing" {
+    $body = @{ } | ConvertTo-Json -Compress
+    try {
+        $res = Invoke-WebRequest -UseBasicParsing -Uri "$baseUrl/api/chat" -Method Post -Body $body -ContentType "application/json"
+        return $false
+    } catch {
+        $status = $_.Exception.Response.StatusCode
+        return ($status -eq "BadRequest")
+    }
+}
+
+# 18. Incident Resolution Not Found (404)
+Assert-Test "POST /api/admin/incidents/resolve - Return 404 when resolving unknown incident" {
+    $body = @{ id = "inc-non-existent-id-999" } | ConvertTo-Json -Compress
+    try {
+        $res = Invoke-WebRequest -UseBasicParsing -Uri "$baseUrl/api/admin/incidents/resolve" -Method Post -Body $body -ContentType "application/json"
+        return $false
+    } catch {
+        $status = $_.Exception.Response.StatusCode
+        return ($status -eq "NotFound")
+    }
+}
+
+# 19. Incident Dispatch Invalid Payload (400)
+Assert-Test "POST /api/admin/incidents - Return 400 on incomplete dispatch parameters" {
+    $body = @{ sector = "North" } | ConvertTo-Json -Compress
+    try {
+        $res = Invoke-WebRequest -UseBasicParsing -Uri "$baseUrl/api/admin/incidents" -Method Post -Body $body -ContentType "application/json"
+        return $false
+    } catch {
+        $status = $_.Exception.Response.StatusCode
+        return ($status -eq "BadRequest")
+    }
+}
+
 Write-Host ""
 Write-Host "==================================================" -ForegroundColor Cyan
 Write-Host " Test Suite Results Summary                      " -ForegroundColor Cyan

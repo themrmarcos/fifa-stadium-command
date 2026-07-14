@@ -141,76 +141,91 @@ try {
                 $body = $reader.ReadToEnd()
                 $reader.Close()
                 
-                $booking = ConvertFrom-Json $body
-                $matchId = $booking.matchId
-                $holderName = $booking.holderName
-                $category = $booking.category
-                $qty = $booking.qty
+                $matchId = $null
+                $holderName = $null
+                $category = $null
+                $qty = $null
+                try {
+                    $booking = ConvertFrom-Json $body
+                    if ($null -ne $booking) {
+                        $matchId = $booking.matchId
+                        $holderName = $booking.holderName
+                        $category = $booking.category
+                        $qty = $booking.qty
+                    }
+                } catch {}
 
-                $match = $dbContent.matches | Where-Object { $_.id -eq $matchId }
-
-                if ($null -eq $match) {
-                    $response.StatusCode = 404
-                    $errBytes = [System.Text.Encoding]::UTF8.GetBytes('{"error": "Match not found"}')
+                if ($null -eq $matchId -or $null -eq $holderName -or $null -eq $category -or $null -eq $qty) {
+                    $response.StatusCode = 400
+                    $errBytes = [System.Text.Encoding]::UTF8.GetBytes('{"error": "Missing required booking parameters"}')
                     $response.ContentType = "application/json"
                     $response.OutputStream.Write($errBytes, 0, $errBytes.Length)
                 } else {
-                    if ($match.ticketsLeft -ge $qty) {
-                        # Update tickets count
-                        $match.ticketsLeft = $match.ticketsLeft - $qty
+                    $match = $dbContent.matches | Where-Object { $_.id -eq $matchId }
 
-                        # Generate seat details
-                        $sectors = @("North", "East", "South", "West")
-                        $chosenSector = $sectors[(Get-Random -Maximum 4)]
-                        $chosenRow = (Get-Random -Minimum 1 -Maximum 41)
-                        $chosenSeat = (Get-Random -Minimum 1 -Maximum 25)
-                        
-                        $chosenGate = "B"
-                        if ($chosenSector -eq "North") { $chosenGate = "A" }
-                        elseif ($chosenSector -eq "East") { $chosenGate = "B" }
-                        elseif ($chosenSector -eq "South") { $chosenGate = "C" }
-                        elseif ($chosenSector -eq "West") { $chosenGate = "D" }
-
-                        $categoryLabels = @("Category 1", "Category 2", "Category 3")
-                        $level = $categoryLabels[[int]$category - 1]
-                        
-                        $secNum = (Get-Random -Minimum 101 -Maximum 116)
-                        $secLabel = "$chosenSector $secNum"
-                        $serial = "FIFA-$(Get-Random -Minimum 10000 -Maximum 99999)-2026"
-
-                        $ticket = [PSCustomObject]@{
-                            matchId = $match.id
-                            team1 = $match.team1
-                            team2 = $match.team2
-                            team1Flag = $match.team1Flag
-                            team2Flag = $match.team2Flag
-                            stadium = $match.stadium
-                            datetime = "$($match.date) • $($match.time)"
-                            holder = $holderName
-                            level = $level
-                            catNum = [int]$category
-                            sec = $secLabel
-                            sector = $chosenSector
-                            row = [int]$chosenRow
-                            seat = [int]$chosenSeat
-                            gate = $chosenGate
-                            serial = $serial
-                        }
-
-                        # Append and Save
-                        $dbContent.bookedTickets += $ticket
-                        $dbContent | ConvertTo-Json -Depth 10 | Set-Content -Path $dbPath -Encoding utf8
-
-                        $ticketJson = $ticket | ConvertTo-Json -Depth 10 -Compress
-                        $resBytes = [System.Text.Encoding]::UTF8.GetBytes($ticketJson)
-                        $response.StatusCode = 201
-                        $response.ContentType = "application/json"
-                        $response.OutputStream.Write($resBytes, 0, $resBytes.Length)
-                    } else {
-                        $response.StatusCode = 400
-                        $errBytes = [System.Text.Encoding]::UTF8.GetBytes('{"error": "Not enough seats available"}')
+                    if ($null -eq $match) {
+                        $response.StatusCode = 404
+                        $errBytes = [System.Text.Encoding]::UTF8.GetBytes('{"error": "Match not found"}')
                         $response.ContentType = "application/json"
                         $response.OutputStream.Write($errBytes, 0, $errBytes.Length)
+                    } else {
+                        if ($match.ticketsLeft -ge $qty) {
+                            # Update tickets count
+                            $match.ticketsLeft = $match.ticketsLeft - $qty
+
+                            # Generate seat details
+                            $sectors = @("North", "East", "South", "West")
+                            $chosenSector = $sectors[(Get-Random -Maximum 4)]
+                            $chosenRow = (Get-Random -Minimum 1 -Maximum 41)
+                            $chosenSeat = (Get-Random -Minimum 1 -Maximum 25)
+                            
+                            $chosenGate = "B"
+                            if ($chosenSector -eq "North") { $chosenGate = "A" }
+                            elseif ($chosenSector -eq "East") { $chosenGate = "B" }
+                            elseif ($chosenSector -eq "South") { $chosenGate = "C" }
+                            elseif ($chosenSector -eq "West") { $chosenGate = "D" }
+
+                            $categoryLabels = @("Category 1", "Category 2", "Category 3")
+                            $level = $categoryLabels[[int]$category - 1]
+                            
+                            $secNum = (Get-Random -Minimum 101 -Maximum 116)
+                            $secLabel = "$chosenSector $secNum"
+                            $serial = "FIFA-$(Get-Random -Minimum 10000 -Maximum 99999)-2026"
+
+                            $ticket = [PSCustomObject]@{
+                                matchId = $match.id
+                                team1 = $match.team1
+                                team2 = $match.team2
+                                team1Flag = $match.team1Flag
+                                team2Flag = $match.team2Flag
+                                stadium = $match.stadium
+                                datetime = "$($match.date) • $($match.time)"
+                                holder = $holderName
+                                level = $level
+                                catNum = [int]$category
+                                sec = $secLabel
+                                sector = $chosenSector
+                                row = [int]$chosenRow
+                                seat = [int]$chosenSeat
+                                gate = $chosenGate
+                                serial = $serial
+                            }
+
+                            # Append and Save
+                            $dbContent.bookedTickets += $ticket
+                            $dbContent | ConvertTo-Json -Depth 10 | Set-Content -Path $dbPath -Encoding utf8
+
+                            $ticketJson = $ticket | ConvertTo-Json -Depth 10 -Compress
+                            $resBytes = [System.Text.Encoding]::UTF8.GetBytes($ticketJson)
+                            $response.StatusCode = 201
+                            $response.ContentType = "application/json"
+                            $response.OutputStream.Write($resBytes, 0, $resBytes.Length)
+                        } else {
+                            $response.StatusCode = 400
+                            $errBytes = [System.Text.Encoding]::UTF8.GetBytes('{"error": "Not enough seats available"}')
+                            $response.ContentType = "application/json"
+                            $response.OutputStream.Write($errBytes, 0, $errBytes.Length)
+                        }
                     }
                 }
 
@@ -219,8 +234,19 @@ try {
                 $body = $reader.ReadToEnd()
                 $reader.Close()
                 
-                $verifyReq = ConvertFrom-Json $body
-                $serial = $verifyReq.serial
+                $serial = $null
+                try {
+                    $verifyReq = ConvertFrom-Json $body
+                    if ($null -ne $verifyReq) { $serial = $verifyReq.serial }
+                } catch {}
+                if ($null -eq $serial -or $serial -eq "") {
+                    $response.StatusCode = 400
+                    $errBytes = [System.Text.Encoding]::UTF8.GetBytes('{"error": "Serial is required"}')
+                    $response.ContentType = "application/json"
+                    $response.OutputStream.Write($errBytes, 0, $errBytes.Length)
+                    $response.Close()
+                    continue
+                }
                 if ($null -ne $serial) {
                     # Strip any non-alphanumeric and non-hyphen characters to prevent JSON/SQLi injections
                     $serial = $serial -replace '[^A-Za-z0-9\-]', ''
@@ -254,8 +280,19 @@ try {
                 $body = $reader.ReadToEnd()
                 $reader.Close()
 
-                $chatReq = ConvertFrom-Json $body
-                $message = $chatReq.message
+                $message = $null
+                try {
+                    $chatReq = ConvertFrom-Json $body
+                    if ($null -ne $chatReq) { $message = $chatReq.message }
+                } catch {}
+                if ($null -eq $message -or $message -eq "") {
+                    $response.StatusCode = 400
+                    $errBytes = [System.Text.Encoding]::UTF8.GetBytes('{"error": "Message is required"}')
+                    $response.ContentType = "application/json"
+                    $response.OutputStream.Write($errBytes, 0, $errBytes.Length)
+                    $response.Close()
+                    continue
+                }
                 if ($null -ne $message) {
                     # Sanitize inputs by stripping out XSS script tags and HTML markup
                     $message = $message -replace '<script[^>]*?>.*?</script>', ''
@@ -353,48 +390,80 @@ try {
                 $body = $reader.ReadToEnd()
                 $reader.Close()
 
-                $incidentReq = ConvertFrom-Json $body
-                $newIncident = [PSCustomObject]@{
-                    id = "inc-$(Get-Random -Minimum 10000 -Maximum 99999)"
-                    sector = $incidentReq.sector
-                    category = $incidentReq.category
-                    severity = $incidentReq.severity
-                    description = $incidentReq.description
-                    status = "ACTIVE"
-                    timestamp = (Get-Date -Format "MMMM dd, yyyy • HH:mm")
+                $sector = $null
+                $category = $null
+                $severity = $null
+                $description = $null
+                try {
+                    $incidentReq = ConvertFrom-Json $body
+                    if ($null -ne $incidentReq) {
+                        $sector = $incidentReq.sector
+                        $category = $incidentReq.category
+                        $severity = $incidentReq.severity
+                        $description = $incidentReq.description
+                    }
+                } catch {}
+
+                if ($null -eq $sector -or $null -eq $category -or $null -eq $severity -or $null -eq $description) {
+                    $response.StatusCode = 400
+                    $errBytes = [System.Text.Encoding]::UTF8.GetBytes('{"error": "Missing required incident fields"}')
+                    $response.ContentType = "application/json"
+                    $response.OutputStream.Write($errBytes, 0, $errBytes.Length)
+                } else {
+                    $newIncident = [PSCustomObject]@{
+                        id = "inc-$(Get-Random -Minimum 10000 -Maximum 99999)"
+                        sector = $sector
+                        category = $category
+                        severity = $severity
+                        description = $description
+                        status = "ACTIVE"
+                        timestamp = (Get-Date -Format "MMMM dd, yyyy • HH:mm")
+                    }
+
+                    $dbContent.incidents += $newIncident
+                    $dbContent | ConvertTo-Json -Depth 10 | Set-Content -Path $dbPath -Encoding utf8
+
+                    $resJson = $newIncident | ConvertTo-Json -Depth 10 -Compress
+                    $resBytes = [System.Text.Encoding]::UTF8.GetBytes($resJson)
+                    $response.StatusCode = 201
+                    $response.ContentType = "application/json"
+                    $response.OutputStream.Write($resBytes, 0, $resBytes.Length)
                 }
-
-                $dbContent.incidents += $newIncident
-                $dbContent | ConvertTo-Json -Depth 10 | Set-Content -Path $dbPath -Encoding utf8
-
-                $resJson = $newIncident | ConvertTo-Json -Depth 10 -Compress
-                $resBytes = [System.Text.Encoding]::UTF8.GetBytes($resJson)
-                $response.StatusCode = 201
-                $response.ContentType = "application/json"
-                $response.OutputStream.Write($resBytes, 0, $resBytes.Length)
 
             } elseif ($method -eq "POST" -and $url -eq "/api/admin/incidents/resolve") {
                 $reader = New-Object System.IO.StreamReader($request.InputStream)
                 $body = $reader.ReadToEnd()
                 $reader.Close()
 
-                $resolveReq = ConvertFrom-Json $body
-                $incId = $resolveReq.id
+                $incId = $null
+                try {
+                    $resolveReq = ConvertFrom-Json $body
+                    if ($null -ne $resolveReq) { $incId = $resolveReq.id }
+                } catch {}
+                $found = $false
 
                 foreach ($inc in $dbContent.incidents) {
                     if ($inc.id -eq $incId) {
                         $inc.status = "RESOLVED"
+                        $found = $true
                     }
                 }
 
-                $dbContent | ConvertTo-Json -Depth 10 | Set-Content -Path $dbPath -Encoding utf8
+                if (-not $found) {
+                    $response.StatusCode = 404
+                    $errBytes = [System.Text.Encoding]::UTF8.GetBytes('{"error": "Incident not found"}')
+                    $response.ContentType = "application/json"
+                    $response.OutputStream.Write($errBytes, 0, $errBytes.Length)
+                } else {
+                    $dbContent | ConvertTo-Json -Depth 10 | Set-Content -Path $dbPath -Encoding utf8
 
-                $resObj = [PSCustomObject]@{ success = $true }
-                $resJson = $resObj | ConvertTo-Json -Depth 10 -Compress
-                $resBytes = [System.Text.Encoding]::UTF8.GetBytes($resJson)
-                $response.StatusCode = 200
-                $response.ContentType = "application/json"
-                $response.OutputStream.Write($resBytes, 0, $resBytes.Length)
+                    $resObj = [PSCustomObject]@{ success = $true }
+                    $resJson = $resObj | ConvertTo-Json -Depth 10 -Compress
+                    $resBytes = [System.Text.Encoding]::UTF8.GetBytes($resJson)
+                    $response.StatusCode = 200
+                    $response.ContentType = "application/json"
+                    $response.OutputStream.Write($resBytes, 0, $resBytes.Length)
+                }
 
             } elseif ($method -eq "POST" -and $url -eq "/api/admin/simulate") {
                 $reader = New-Object System.IO.StreamReader($request.InputStream)

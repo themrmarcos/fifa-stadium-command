@@ -11,7 +11,7 @@
                         "location":  "NY/NJ, USA",
                         "date":  "June 16, 2026",
                         "time":  "19:30",
-                        "ticketsLeft":  117,
+                        "ticketsLeft":  115,
                         "gate":  "Gate B",
                         "sec":  104,
                         "row":  12,
@@ -195,6 +195,42 @@
                               "seat":  5,
                               "gate":  "A",
                               "serial":  "FIFA-15351-2026"
+                          },
+                          {
+                              "matchId":  "m1",
+                              "team1":  "USA",
+                              "team2":  "GER",
+                              "team1Flag":  "https://flagcdn.com/w80/us.png",
+                              "team2Flag":  "https://flagcdn.com/w80/de.png",
+                              "stadium":  "MetLife Stadium",
+                              "datetime":  "June 16, 2026 â€¢ 19:30",
+                              "holder":  "Jane Doe",
+                              "level":  "Category 1",
+                              "catNum":  1,
+                              "sec":  "East 107",
+                              "sector":  "East",
+                              "row":  15,
+                              "seat":  1,
+                              "gate":  "B",
+                              "serial":  "FIFA-56456-2026"
+                          },
+                          {
+                              "matchId":  "m1",
+                              "team1":  "USA",
+                              "team2":  "GER",
+                              "team1Flag":  "https://flagcdn.com/w80/us.png",
+                              "team2Flag":  "https://flagcdn.com/w80/de.png",
+                              "stadium":  "MetLife Stadium",
+                              "datetime":  "June 16, 2026 â€¢ 19:30",
+                              "holder":  "Jane Doe",
+                              "level":  "Category 1",
+                              "catNum":  1,
+                              "sec":  "West 108",
+                              "sector":  "West",
+                              "row":  6,
+                              "seat":  15,
+                              "gate":  "D",
+                              "serial":  "FIFA-62672-2026"
                           }
                       ],
     "incidents":  [
@@ -287,6 +323,42 @@
                           "description":  "Simulated spike: Gate B crowd density reached 94%. Dispatched additional volunteer escorts.",
                           "status":  "ACTIVE",
                           "timestamp":  "July 15, 2026 â€¢ 01:42"
+                      },
+                      {
+                          "id":  "inc-68583",
+                          "sector":  "South",
+                          "category":  "Medical",
+                          "severity":  "HIGH",
+                          "description":  "Test dispatcher medical alert.",
+                          "status":  "RESOLVED",
+                          "timestamp":  "July 15, 2026 â€¢ 01:49"
+                      },
+                      {
+                          "id":  "inc-79450",
+                          "sector":  "East",
+                          "category":  "Crowd Congestion",
+                          "severity":  "HIGH",
+                          "description":  "Simulated spike: Gate B crowd density reached 94%. Dispatched additional volunteer escorts.",
+                          "status":  "ACTIVE",
+                          "timestamp":  "July 15, 2026 â€¢ 01:49"
+                      },
+                      {
+                          "id":  "inc-88745",
+                          "sector":  "South",
+                          "category":  "Medical",
+                          "severity":  "HIGH",
+                          "description":  "Test dispatcher medical alert.",
+                          "status":  "RESOLVED",
+                          "timestamp":  "July 15, 2026 â€¢ 01:50"
+                      },
+                      {
+                          "id":  "inc-71452",
+                          "sector":  "East",
+                          "category":  "Crowd Congestion",
+                          "severity":  "HIGH",
+                          "description":  "Simulated spike: Gate B crowd density reached 94%. Dispatched additional volunteer escorts.",
+                          "status":  "ACTIVE",
+                          "timestamp":  "July 15, 2026 â€¢ 01:50"
                       }
                   ]
 }
