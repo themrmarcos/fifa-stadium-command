@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIFA 2026 Ticket Booking & Seating Pathfinder</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main Style -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="app-logo">
+                    <svg viewBox="0 0 100 100" class="logo-svg">
+                        <polygon points="50,15 90,38 90,83 50,95 10,83 10,38" fill="none" stroke="url(#goldGradient)" stroke-width="4" />
+                        <circle cx="50" cy="50" r="22" fill="none" stroke="#FFD700" stroke-width="2" />
+                        <path d="M 50,15 L 50,50 L 90,83" stroke="#FFD700" stroke-width="2" />
+                        <path d="M 10,38 L 50,50 L 90,38" stroke="#FFD700" stroke-width="2" />
+                        <path d="M 10,83 L 50,50 L 50,95" stroke="#FFD700" stroke-width="2" />
+                        <circle cx="50" cy="50" r="8" fill="#FFD700" />
+                        <defs>
+                            <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#FFE259" />
+                                <stop offset="100%" stop-color="#FFA751" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <div class="logo-text">
+                        <h1>FIFA<span>Pass 26</span></h1>
+                        <span class="tagline">Tickets &amp; Seat Locator</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Navigation Tabs -->
+            <div class="header-center">
+                <div class="nav-tabs">
+                    <button class="tab-btn active" data-tab="booking">
+                        <i class="fa-solid fa-ticket-simple"></i> Book Tickets
+                    </button>
+                    <button class="tab-btn" id="nav-btn-tickets" data-tab="tickets">
+                        <i class="fa-solid fa-wallet"></i> My Tickets <span class="tab-badge" id="tickets-count-badge">0</span>
+                    </button>
+                    <button class="tab-btn" id="nav-btn-pathfinder" data-tab="pathfinder">
+                        <i class="fa-solid fa-map-location-dot"></i> Seat Pathfinder
+                    </button>
+                </div>
+            </div>
+
+            <!-- Profile Info -->
+            <div class="header-right">
+                <div class="user-badge">
+                    <div class="user-avatar"><i class="fa-regular fa-user"></i></div>
+                    <div class="user-details">
+                        <span class="user-name">Guest Fan</span>
+                        <span class="user-status"><i class="fa-solid fa-circle text-success"></i> Connected</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="main-workspace">
+
+            <!-- ================= BOOKING TAB ================= -->
+            <section id="tab-booking" class="tab-section active">
+                <div class="section-title-bar">
+                    <h2>Select a FIFA World Cup 2026™ Match</h2>
+                    <p class="section-desc">Select an upcoming tournament match, choose your ticket level, and generate your interactive smart ticket.</p>
+                </div>
+
+                <div class="booking-grid">
+                    <!-- Matches List -->
+                    <div class="matches-list-container">
+                        <div class="matches-grid" id="matches-grid">
+                            <!-- Match Cards injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Selections & Checkout Form -->
+                    <div class="booking-form-container">
+                        <div class="card glassmorphic sticky-card" id="checkout-card">
+                            <div class="card-placeholder" id="checkout-placeholder">
+                                <i class="fa-solid fa-ticket fa-3x text-muted animate-pulse"></i>
+                                <h4>Select a match to start booking</h4>
+                                <p>Interactive pricing, seating categories, and live ticket generation will unlock once a match is selected.</p>
+                            </div>
+                            
+                            <!-- Booking Form (Hidden until match selected) -->
+                            <div class="booking-form-wrapper hidden" id="booking-form">
+                                <div class="form-match-header">
+                                    <span class="match-badge">SELECTED MATCH</span>
+                                    <h3 id="form-match-title">USA vs. Germany</h3>
+                                    <span class="form-match-loc" id="form-match-venue"><i class="fa-solid fa-location-dot"></i> MetLife Stadium (NY/NJ)</span>
+                                </div>
+
+                                <form id="ticket-purchase-form">
+                                    <div class="form-group">
+                                        <label class="form-label">Select Seating Category</label>
+                                        <div class="seating-categories-grid">
+                                            <label class="category-option">
+                                                <input type="radio" name="seat-category" value="1" checked>
+                                                <span class="cat-card">
+                                                    <span class="cat-name">Category 1</span>
+                                                    <span class="cat-level">Pitchside & Lower Tier</span>
+                                                    <span class="cat-price">$380</span>
+                                                </span>
+                                            </label>
+                                            <label class="category-option">
+                                                <input type="radio" name="seat-category" value="2">
+                                                <span class="cat-card">
+                                                    <span class="cat-name">Category 2</span>
+                                                    <span class="cat-level">Middle Tier / Club Level</span>
+                                                    <span class="cat-price">$240</span>
+                                                </span>
+                                            </label>
+                                            <label class="category-option">
+                                                <input type="radio" name="seat-category" value="3">
+                                                <span class="cat-card">
+                                                    <span class="cat-name">Category 3</span>
+                                                    <span class="cat-level">Upper Deck / General</span>
+                                                    <span class="cat-price">$120</span>
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="ticket-holder" class="form-label">Ticket Holder Name</label>
+                                            <input type="text" id="ticket-holder" placeholder="Enter full name" required>
+                                        </div>
+                                        <div class="form-group max-w-100">
+                                            <label for="ticket-qty" class="form-label">Quantity</label>
+                                            <select id="ticket-qty">
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Price Calculation Summary -->
+                                    <div class="price-summary-box">
+                                        <div class="summary-line">
+                                            <span>Ticket Price (<span id="calc-cat-label">Cat 1</span>)</span>
+                                            <span id="calc-base-price">$380.00</span>
+                                        </div>
+                                        <div class="summary-line">
+                                            <span>Quantity</span>
+                                            <span id="calc-qty">x 1</span>
+                                        </div>
+                                        <div class="summary-line">
+                                            <span>FIFA Operations Fee</span>
+                                            <span>$15.00</span>
+                                        </div>
+                                        <div class="summary-line total-line">
+                                            <span>Total Amount</span>
+                                            <span id="calc-total">$395.00</span>
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary btn-block">
+                                        <i class="fa-solid fa-check-double"></i> Complete Booking & Generate Ticket
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= MY TICKETS WALLET ================= -->
+            <section id="tab-tickets" class="tab-section">
+                <div class="section-title-bar">
+                    <h2>My FIFA Ticket Wallet</h2>
+                    <p class="section-desc">Manage your booked match tickets, generate digital smart passes, and simulate entrance scan credentials.</p>
+                </div>
+
+                <div id="tickets-wallet-container" class="tickets-wallet-empty">
+                    <!-- Shown if no tickets are booked -->
+                    <div class="empty-wallet-card card glassmorphic">
+                        <i class="fa-solid fa-wallet fa-4x text-muted"></i>
+                        <h3>Your Wallet is Empty</h3>
+                        <p>You haven't booked any match tickets yet. Go to the "Book Tickets" tab to secure your stadium seat.</p>
+                        <button class="btn btn-primary" onclick="document.querySelector('.tab-btn[data-tab=booking]').click()">
+                            Browse Matches
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tickets Display Layout (Hidden when empty) -->
+                <div id="tickets-wallet-active" class="tickets-wallet-active hidden">
+                    <div class="wallet-grid">
+                        
+                        <!-- Tickets List Slider -->
+                        <div class="tickets-selector-list" id="wallet-tickets-list">
+                            <!-- Injected by JS -->
+                        </div>
+
+                        <!-- Ticket Pass Card Details -->
+                        <div class="ticket-viewer-panel">
+                            <!-- Ticket Wrapper -->
+                            <div class="ticket-container" id="ticket-pass-card">
+                                <!-- Ticket Top header -->
+                                <div class="ticket-header-strip">
+                                    <div class="strip-logo"><i class="fa-solid fa-trophy"></i> FIFA WORLD CUP 26</div>
+                                    <span class="ticket-sec-lbl" id="ticket-lbl-match-type">GROUP STAGE</span>
+                                </div>
+
+                                <!-- Ticket Main Details -->
+                                <div class="ticket-body-strip">
+                                    <div class="ticket-teams-row">
+                                        <div class="team-col">
+                                            <img src="" id="ticket-img-team1" class="team-flag" alt="Team 1">
+                                            <span class="team-name-lbl" id="ticket-lbl-team1">USA</span>
+                                        </div>
+                                        <div class="teams-separator">VS</div>
+                                        <div class="team-col">
+                                            <img src="" id="ticket-img-team2" class="team-flag" alt="Team 2">
+                                            <span class="team-name-lbl" id="ticket-lbl-team2">ENG</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="ticket-meta-grid">
+                                        <div class="meta-item">
+                                            <span class="meta-lbl">STADIUM</span>
+                                            <span class="meta-val" id="ticket-lbl-stadium">MetLife Stadium</span>
+                                        </div>
+                                        <div class="meta-item">
+                                            <span class="meta-lbl">DATE / TIME</span>
+                                            <span class="meta-val" id="ticket-lbl-datetime">July 14, 2026 • 20:00</span>
+                                        </div>
+                                        <div class="meta-item">
+                                            <span class="meta-lbl">HOLDER</span>
+                                            <span class="meta-val" id="ticket-lbl-holder">John Doe</span>
+                                        </div>
+                                        <div class="meta-item">
+                                            <span class="meta-lbl">PRICE LEVEL</span>
+                                            <span class="meta-val" id="ticket-lbl-level">Category 1</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Ticket Seating Cutout -->
+                                <div class="ticket-seating-strip">
+                                    <div class="seat-badge-col">
+                                        <span class="seat-badge-lbl">SECTION</span>
+                                        <span class="seat-badge-val" id="ticket-lbl-sec">104</span>
+                                    </div>
+                                    <div class="seat-badge-col">
+                                        <span class="seat-badge-lbl">ROW</span>
+                                        <span class="seat-badge-val" id="ticket-lbl-row">12</span>
+                                    </div>
+                                    <div class="seat-badge-col">
+                                        <span class="seat-badge-lbl">SEAT</span>
+                                        <span class="seat-badge-val" id="ticket-lbl-seat">4</span>
+                                    </div>
+                                    <div class="seat-badge-col">
+                                        <span class="seat-badge-lbl">GATE ENTRY</span>
+                                        <span class="seat-badge-val" id="ticket-lbl-gate">Gate B</span>
+                                    </div>
+                                </div>
+
+                                <!-- Ticket Barcode & QR Cutout -->
+                                <div class="ticket-barcode-strip">
+                                    <div class="barcode-graphics">
+                                        <!-- Interactive SVG QR code -->
+                                        <svg viewBox="0 0 100 100" class="ticket-qr-svg" id="ticket-pass-qr">
+                                            <rect width="100" height="100" fill="#ffffff" />
+                                            <!-- QR code modules simulation -->
+                                            <rect x="10" y="10" width="25" height="25" fill="#000" />
+                                            <rect x="15" y="15" width="15" height="15" fill="#fff" />
+                                            <rect x="18" y="18" width="9" height="9" fill="#000" />
+                                            
+                                            <rect x="65" y="10" width="25" height="25" fill="#000" />
+                                            <rect x="70" y="15" width="15" height="15" fill="#fff" />
+                                            <rect x="73" y="18" width="9" height="9" fill="#000" />
+
+                                            <rect x="10" y="65" width="25" height="25" fill="#000" />
+                                            <rect x="15" y="70" width="15" height="15" fill="#fff" />
+                                            <rect x="18" y="73" width="9" height="9" fill="#000" />
+
+                                            <!-- Random matrix blocks -->
+                                            <rect x="45" y="15" width="10" height="10" fill="#000" />
+                                            <rect x="50" y="30" width="15" height="10" fill="#000" />
+                                            <rect x="40" y="45" width="20" height="15" fill="#000" />
+                                            <rect x="65" y="45" width="10" height="10" fill="#000" />
+                                            <rect x="15" y="45" width="15" height="10" fill="#000" />
+                                            <rect x="45" y="65" width="10" height="20" fill="#000" />
+                                            <rect x="65" y="65" width="20" height="10" fill="#000" />
+                                            <rect x="75" y="80" width="15" height="10" fill="#000" />
+                                        </svg>
+                                        <div class="barcode-lines-box">
+                                            <div class="barcode-line"></div><div class="barcode-line"></div>
+                                            <div class="barcode-line"></div><div class="barcode-line"></div>
+                                            <div class="barcode-line"></div><div class="barcode-line"></div>
+                                            <div class="barcode-line"></div><div class="barcode-line"></div>
+                                            <div class="barcode-line"></div><div class="barcode-line"></div>
+                                            <span class="barcode-numeric-lbl" id="ticket-lbl-serial">FIFA-88290-2026</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Verification Actions -->
+                            <div class="ticket-actions-box">
+                                <button class="btn btn-success" id="btn-scan-simulate">
+                                    <i class="fa-solid fa-qrcode"></i> Scan &amp; Verify at Stadium Gate
+                                </button>
+                                <button class="btn btn-outline" id="btn-wallet-locate-seat">
+                                    <i class="fa-solid fa-location-crosshairs"></i> Navigate Seating Pathway
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= SEAT PATHFINDER TAB ================= -->
+            <section id="tab-pathfinder" class="tab-section">
+                <div class="section-title-bar">
+                    <h2>Interactive Seating Pathfinder</h2>
+                    <p class="section-desc">Locate your exact seating section and view an animated route layout from the stadium gates to your row.</p>
+                </div>
+
+                <div class="pathfinder-workspace">
+                    <!-- Left: Control Panels -->
+                    <div class="pathfinder-controls">
+                        <!-- Custom Seating Input -->
+                        <div class="card glassmorphic">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-route text-primary"></i> Seating Coordinates</h3>
+                            </div>
+                            <div class="card-body">
+                                <form id="pathfinder-inputs-form">
+                                    <div class="form-group">
+                                        <label for="route-ticket-select" class="form-label">Choose Ticket</label>
+                                        <select id="route-ticket-select" class="form-select">
+                                            <option value="">No active tickets booked</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="route-gate-select" class="form-label">Entrance Gate</label>
+                                            <select id="route-gate-select">
+                                                <option value="A">Gate A (North)</option>
+                                                <option value="B" selected>Gate B (East)</option>
+                                                <option value="C">Gate C (South)</option>
+                                                <option value="D">Gate D (West)</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="route-sector-select" class="form-label">Target Section</label>
+                                            <select id="route-sector-select">
+                                                <option value="North">Section North</option>
+                                                <option value="East" selected>Section East</option>
+                                                <option value="South">Section South</option>
+                                                <option value="West">Section West</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-block">
+                                        <i class="fa-solid fa-location-arrow"></i> Trace Navigation Path
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Seating Assistant GenAI Chatbot -->
+                        <div class="card glassmorphic pathfinder-chat-card">
+                            <div class="card-header">
+                                <div class="chat-header-title">
+                                    <i class="fa-solid fa-circle-question text-secondary"></i>
+                                    <h3>Seat Assistant AI</h3>
+                                </div>
+                                <span class="badge badge-success">Online</span>
+                            </div>
+                            <div class="card-body chat-body" id="assistant-chat-messages">
+                                <div class="chat-bubble bot">
+                                    I am your Seating Logistics Assistant. Input your ticket coordinates to trace your route, or ask me about amenities (restrooms, foods, accessibility elevators) near your section.
+                                </div>
+                            </div>
+                            <div class="chat-input-row">
+                                <form id="assistant-chat-form" style="display:flex; width:100%; gap:8px;">
+                                    <input type="text" id="assistant-chat-input" placeholder="Ask about Section East accessibility, near concessions..." required autocomplete="off">
+                                    <button type="submit" class="btn btn-secondary btn-icon-only"><i class="fa-solid fa-paper-plane"></i></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Center: Stadium Map Viewport -->
+                    <div class="pathfinder-map-viewport">
+                        <div class="card glassmorphic height-full">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-map text-primary"></i> Stadium Seat Map Route</h3>
+                                <span class="badge badge-outline" id="map-route-indicator">Awaiting Seat Tracing</span>
+                            </div>
+                            <div class="card-body flex-center" style="position:relative; flex: 1;">
+                                <!-- Pathfinder SVG Layout -->
+                                <svg viewBox="0 0 500 500" class="pathfinder-svg" id="stadium-pathfinder-svg">
+                                    <circle cx="250" cy="250" r="230" class="stadium-ring-outer" />
+                                    <circle cx="250" cy="250" r="200" class="stadium-ring-inner" />
+                                    
+                                    <!-- Gates -->
+                                    <circle cx="250" cy="20" r="12" class="gate-node" id="node-gate-A" />
+                                    <text x="250" y="24" class="gate-txt">A</text>
+                                    
+                                    <circle cx="480" cy="250" r="12" class="gate-node" id="node-gate-B" />
+                                    <text x="480" y="254" class="gate-txt">B</text>
+                                    
+                                    <circle cx="250" cy="480" r="12" class="gate-node" id="node-gate-C" />
+                                    <text x="250" y="484" class="gate-txt">C</text>
+                                    
+                                    <circle cx="20" cy="250" r="12" class="gate-node" id="node-gate-D" />
+                                    <text x="20" y="254" class="gate-txt">D</text>
+
+                                    <!-- Stadium Seating Zones -->
+                                    <path id="sector-path-North" d="M 137,137 A 160,160 0 0,1 363,137" fill="none" stroke="#2c3e50" stroke-width="25" stroke-opacity="0.6" class="sector-segment" />
+                                    <path id="sector-path-East" d="M 363,137 A 160,160 0 0,1 363,363" fill="none" stroke="#2c3e50" stroke-width="25" stroke-opacity="0.6" class="sector-segment" />
+                                    <path id="sector-path-South" d="M 363,363 A 160,160 0 0,1 137,363" fill="none" stroke="#2c3e50" stroke-width="25" stroke-opacity="0.6" class="sector-segment" />
+                                    <path id="sector-path-West" d="M 137,363 A 160,160 0 0,1 137,137" fill="none" stroke="#2c3e50" stroke-width="25" stroke-opacity="0.6" class="sector-segment" />
+
+                                    <!-- Inside Stadium Pitch -->
+                                    <rect x="180" y="160" width="140" height="180" fill="#1b4d3e" stroke="rgba(255,255,255,0.3)" stroke-width="2" />
+                                    <circle cx="250" cy="250" r="20" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" />
+                                    <line x1="180" y1="250" x2="320" y2="250" stroke="rgba(255,255,255,0.3)" stroke-width="2" />
+
+                                    <!-- Navigation Pathway SVG Line (Drawn dynamically) -->
+                                    <path id="svg-navigation-route" d="" fill="none" stroke="var(--color-primary)" stroke-width="4" stroke-linecap="round" class="route-line-animation hidden" />
+                                    
+                                    <!-- Dynamic Route Pulsing Marker -->
+                                    <circle id="route-pulse-marker" cx="0" cy="0" r="6" fill="#00FF33" class="hidden" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Seating 3D-Perspective View -->
+                    <div class="pathfinder-3d-view">
+                        <div class="card glassmorphic height-full">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-eye text-primary"></i> 3D Seating Angle Preview</h3>
+                                <span class="badge badge-primary" id="view-angle-badge">Category 1 View</span>
+                            </div>
+                            <div class="card-body flex-center flex-column" style="position:relative; flex: 1;">
+                                <div class="canvas-container">
+                                    <canvas id="perspective-canvas" width="300" height="240"></canvas>
+                                    <div class="pitch-overlay-instructions">
+                                        Simulated field preview from seat height
+                                    </div>
+                                </div>
+                                <div class="view-telemetry">
+                                    <div class="telemetry-item">
+                                        <span class="tele-lbl">Field Distance</span>
+                                        <span class="tele-val" id="tele-dist">15 meters</span>
+                                    </div>
+                                    <div class="telemetry-item">
+                                        <span class="tele-lbl">Elevation Angle</span>
+                                        <span class="tele-val" id="tele-angle">8° (Field Level)</span>
+                                    </div>
+                                    <div class="telemetry-item">
+                                        <span class="tele-lbl">Line of Sight</span>
+                                        <span class="tele-val text-success"><i class="fa-solid fa-circle-check"></i> Unobstructed</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Modals -->
+        <div class="modal-overlay hidden" id="scan-modal">
+            <div class="modal-card glassmorphic">
+                <div class="modal-header">
+                    <h3><i class="fa-solid fa-microchip-ai text-primary"></i> GenAI Entrance Scan Verification</h3>
+                    <button class="modal-close-btn" id="btn-close-modal"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="scanner-laser-box">
+                        <div class="laser-line"></div>
+                        <i class="fa-solid fa-qrcode fa-5x scanner-icon"></i>
+                    </div>
+                    <h4 class="scan-status-lbl" id="scan-status-text">INITIATING AI SECURITY TRIAGE...</h4>
+                    <div class="scan-checklist-box" id="scan-checklist">
+                        <div class="check-item"><span class="check-dot"></span> Authenticating Booking Code</div>
+                        <div class="check-item"><span class="check-dot"></span> Checking Azteca Stadium occupancy sync</div>
+                        <div class="check-item"><span class="check-dot"></span> Formatting entry gate directions</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <div class="footer-left">
+                <p>&copy; 2026 FIFA World Cup Ticket Booking & Seat Routing System.</p>
+            </div>
+            <div class="footer-right">
+                <span><i class="fa-solid fa-shield-halved text-success"></i> Verified Tickets Only</span>
+                <span>•</span>
+                <span>v1.2.0-sec</span>
+            </div>
+        </footer>
+
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

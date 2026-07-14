@@ -1,0 +1,30 @@
+# Node dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.env
+
+# Flutter dependencies
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+/build/
+*.flutter-plugins
+*.flutter-plugins-dependencies
+
+# IDEs
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+
+# React build
+dist/
+dist-ssr/
+*.local

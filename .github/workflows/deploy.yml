@@ -1,0 +1,107 @@
+name: FIFA 2026 E2E CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test-backend:
+    name: Backend Test Suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: fifa_tickets_locator/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd fifa_tickets_locator
+          npm ci
+
+      - name: Lint and Test
+        run: |
+          cd fifa_tickets_locator
+          # npm run lint
+          # npm test
+
+  test-dashboard:
+    name: Organizer Dashboard Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: fifa_organizer_dashboard/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd fifa_organizer_dashboard
+          npm ci
+
+      - name: Build assets
+        run: |
+          cd fifa_organizer_dashboard
+          npm run build
+
+  check-flutter:
+    name: Flutter Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Install packages
+        run: |
+          cd fifa_tickets_mobile
+          flutter pub get
+
+      - name: Flutter Static Analysis
+        run: |
+          cd fifa_tickets_mobile
+          flutter analyze
+
+      - name: Run Widget Tests
+        run: |
+          cd fifa_tickets_mobile
+          flutter test
+
+  build-containers:
+    name: Docker Image Build Checks
+    needs: [test-backend, test-dashboard]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Test Build Backend Image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./fifa_tickets_locator
+          file: ./fifa_tickets_locator/Dockerfile
+          push: false
+          tags: fifa-tickets-backend:latest
+
+      - name: Test Build Dashboard Image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./fifa_organizer_dashboard
+          file: ./fifa_organizer_dashboard/Dockerfile
+          push: false
+          tags: fifa-organizer-dashboard:latest

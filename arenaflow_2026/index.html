@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArenaFlow 2026 - FIFA World Cup Stadium Operations & Fan Companion</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main Style -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- App Container -->
+    <div class="app-container">
+        
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="app-logo">
+                    <svg viewBox="0 0 100 100" class="logo-svg">
+                        <circle cx="50" cy="50" r="45" fill="none" stroke="url(#logoGradient)" stroke-width="4" />
+                        <path d="M 50,5 A 45,45 0 0,0 20,83 L 50,50 Z" fill="rgba(0, 242, 254, 0.15)" />
+                        <path d="M 50,50 L 80,83 A 45,45 0 0,0 50,5 Z" fill="rgba(79, 172, 254, 0.25)" />
+                        <!-- Soccer ball pattern outline -->
+                        <polygon points="50,30 35,40 40,60 60,60 65,40" fill="none" stroke="#00F2FE" stroke-width="2" />
+                        <line x1="50" y1="5" x2="50" y2="30" stroke="#00F2FE" stroke-width="2" />
+                        <line x1="95" y1="50" x2="65" y2="40" stroke="#00F2FE" stroke-width="2" />
+                        <line x1="80" y1="83" x2="60" y2="60" stroke="#00F2FE" stroke-width="2" />
+                        <line x1="20" y1="83" x2="40" y2="60" stroke="#00F2FE" stroke-width="2" />
+                        <line x1="5" y1="50" x2="35" y2="40" stroke="#00F2FE" stroke-width="2" />
+                        <defs>
+                            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#00F2FE" />
+                                <stop offset="100%" stop-color="#4FACFE" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <div class="logo-text">
+                        <h1>Arena<span>Flow</span></h1>
+                        <span class="tagline">FIFA World Cup 2026</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View Switcher -->
+            <div class="header-center">
+                <div class="view-switcher">
+                    <button class="switch-btn active" id="btn-fan-view" data-view="fan">
+                        <i class="fa-solid fa-users"></i> Fan Companion
+                    </button>
+                    <button class="switch-btn" id="btn-ops-view" data-view="ops">
+                        <i class="fa-solid fa-tower-observation"></i> Operations Command
+                    </button>
+                </div>
+            </div>
+
+            <!-- Header Right Info -->
+            <div class="header-right">
+                <div class="stadium-selector-wrapper">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <select id="stadium-select" class="stadium-select">
+                        <option value="metlife">MetLife Stadium (NY/NJ)</option>
+                        <option value="azteca">Estadio Azteca (Mexico City)</option>
+                        <option value="bcplace">BC Place (Vancouver)</option>
+                    </select>
+                </div>
+                <div class="live-clock">
+                    <i class="fa-regular fa-clock"></i>
+                    <span id="header-time">22:40:21 EST</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Match Banner -->
+        <div class="match-banner">
+            <div class="banner-badge"><span class="pulse-dot"></span> LIVE MATCH DAY</div>
+            <div class="banner-matchup">
+                <span class="country"><img src="https://flagcdn.com/w40/us.png" alt="USA"> USA</span>
+                <span class="vs">VS</span>
+                <span class="country">ENG <img src="https://flagcdn.com/w40/gb.png" alt="England"></span>
+            </div>
+            <div class="banner-details">
+                <span><i class="fa-solid fa-clock-o"></i> Kickoff in 2h 20m</span>
+                <span><i class="fa-solid fa-thermometer-half"></i> 24°C / 75°F</span>
+                <span><i class="fa-solid fa-ticket"></i> Sellout (82,500 expected)</span>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+
+            <!-- ================= FAN PORTAL VIEW ================= -->
+            <section id="view-fan" class="view-section active">
+                <div class="view-grid">
+                    
+                    <!-- Left Side: Live Stadium Insights -->
+                    <div class="grid-col-left">
+                        
+                        <!-- Stadium Map & Heatmap Widget -->
+                        <div class="card glassmorphic map-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-map-location-dot text-primary"></i> Interactive Stadium Map</h3>
+                                <div class="map-toggles">
+                                    <button class="map-toggle-btn active" data-layer="queues">Gates & Queues</button>
+                                    <button class="map-toggle-btn" data-layer="amenities">Amenities & Access</button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="stadium-map-container">
+                                    <!-- Interactive SVG Stadium Layout -->
+                                    <svg viewBox="0 0 500 500" class="stadium-svg" id="interactive-stadium-map">
+                                        <!-- Background Circle -->
+                                        <circle cx="250" cy="250" r="230" class="stadium-outer-ring" />
+                                        
+                                        <!-- Outer Gates -->
+                                        <!-- Gate A (North) -->
+                                        <g id="map-gate-A" class="map-gate pointer" data-gate="A">
+                                            <circle cx="250" cy="35" r="14" class="gate-node node-success" />
+                                            <text x="250" y="39" class="gate-label">A</text>
+                                        </g>
+                                        <!-- Gate B (East) -->
+                                        <g id="map-gate-B" class="map-gate pointer" data-gate="B">
+                                            <circle cx="465" cy="250" r="14" class="gate-node node-danger" />
+                                            <text x="465" y="254" class="gate-label">B</text>
+                                        </g>
+                                        <!-- Gate C (South) -->
+                                        <g id="map-gate-C" class="map-gate pointer" data-gate="C">
+                                            <circle cx="250" cy="465" r="14" class="gate-node node-warning" />
+                                            <text x="250" y="469" class="gate-label">C</text>
+                                        </g>
+                                        <!-- Gate D (West) -->
+                                        <g id="map-gate-D" class="map-gate pointer" data-gate="D">
+                                            <circle cx="35" cy="250" r="14" class="gate-node node-success" />
+                                            <text x="35" y="254" class="gate-label">D</text>
+                                        </g>
+
+                                        <!-- Outer Seating Ring -->
+                                        <path d="M 250,90 A 160,160 0 1,0 250,410 A 160,160 0 1,0 250,90" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="40" />
+                                        
+                                        <!-- Seating Zones (Interactive sectors) -->
+                                        <!-- Sector North -->
+                                        <path id="sector-north" d="M 137,137 A 160,160 0 0,1 363,137" fill="none" stroke="#22c55e" stroke-width="36" stroke-opacity="0.3" class="stadium-sector pointer" data-sector="North" />
+                                        <!-- Sector East -->
+                                        <path id="sector-east" d="M 363,137 A 160,160 0 0,1 363,363" fill="none" stroke="#ef4444" stroke-width="36" stroke-opacity="0.65" class="stadium-sector pointer" data-sector="East" />
+                                        <!-- Sector South -->
+                                        <path id="sector-south" d="M 363,363 A 160,160 0 0,1 137,363" fill="none" stroke="#f59e0b" stroke-width="36" stroke-opacity="0.4" class="stadium-sector pointer" data-sector="South" />
+                                        <!-- Sector West -->
+                                        <path id="sector-west" d="M 137,363 A 160,160 0 0,1 137,137" fill="none" stroke="#22c55e" stroke-width="36" stroke-opacity="0.2" class="stadium-sector pointer" data-sector="West" />
+
+                                        <!-- Inner Seating Ring -->
+                                        <circle cx="250" cy="250" r="120" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="15" />
+                                        
+                                        <!-- Soccer Pitch (Field) -->
+                                        <rect x="180" y="150" width="140" height="200" rx="4" fill="#155e75" stroke="rgba(255,255,255,0.4)" stroke-width="2" />
+                                        <circle cx="250" cy="250" r="25" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2" />
+                                        <line x1="180" y1="250" x2="320" y2="250" stroke="rgba(255,255,255,0.4)" stroke-width="2" />
+
+                                        <!-- Accessibility Icons/Labels overlay (amenities layer) -->
+                                        <g id="layer-amenities" class="map-overlay-layer hidden">
+                                            <!-- Restroom 1 -->
+                                            <g class="amenity-icon" transform="translate(180, 105)">
+                                                <circle cx="0" cy="0" r="10" fill="#00F2FE" />
+                                                <text x="-5" y="4" font-family="FontAwesome" font-size="11" fill="#000">&#xf183;</text>
+                                            </g>
+                                            <!-- Elevator (Accessibility) -->
+                                            <g class="amenity-icon" transform="translate(320, 105)">
+                                                <circle cx="0" cy="0" r="10" fill="#a855f7" />
+                                                <text x="-5" y="4" font-family="FontAwesome" font-size="11" fill="#fff">&#xf13d;</text>
+                                            </g>
+                                            <!-- Medical Aid -->
+                                            <g class="amenity-icon" transform="translate(320, 395)">
+                                                <circle cx="0" cy="0" r="10" fill="#ef4444" />
+                                                <text x="-5" y="4" font-family="FontAwesome" font-size="11" fill="#fff">&#xf0fa;</text>
+                                            </g>
+                                            <!-- Concession -->
+                                            <g class="amenity-icon" transform="translate(180, 395)">
+                                                <circle cx="0" cy="0" r="10" fill="#eab308" />
+                                                <text x="-5" y="4" font-family="FontAwesome" font-size="11" fill="#000">&#xf2e7;</text>
+                                            </g>
+                                        </g>
+                                    </svg>
+                                    <!-- Dynamic Map Floating Tooltip -->
+                                    <div class="map-tooltip" id="map-tooltip">Hover over gates or sectors for details</div>
+                                </div>
+
+                                <!-- Live Gate Status Cards -->
+                                <div class="gate-status-panel">
+                                    <div class="gate-mini-card" data-gate="A">
+                                        <div class="gate-meta">
+                                            <span class="gate-name">Gate A (North)</span>
+                                            <span class="badge badge-success">Fast</span>
+                                        </div>
+                                        <div class="gate-time">
+                                            <span class="time-val" id="gate-time-A">3 min</span> wait
+                                        </div>
+                                    </div>
+                                    <div class="gate-mini-card" data-gate="B">
+                                        <div class="gate-meta">
+                                            <span class="gate-name">Gate B (East)</span>
+                                            <span class="badge badge-danger">Congested</span>
+                                        </div>
+                                        <div class="gate-time">
+                                            <span class="time-val" id="gate-time-B">24 min</span> wait
+                                        </div>
+                                    </div>
+                                    <div class="gate-mini-card" data-gate="C">
+                                        <div class="gate-meta">
+                                            <span class="gate-name">Gate C (South)</span>
+                                            <span class="badge badge-warning">Moderate</span>
+                                        </div>
+                                        <div class="gate-time">
+                                            <span class="time-val" id="gate-time-C">14 min</span> wait
+                                        </div>
+                                    </div>
+                                    <div class="gate-mini-card" data-gate="D">
+                                        <div class="gate-meta">
+                                            <span class="gate-name">Gate D (West)</span>
+                                            <span class="badge badge-success">Fast</span>
+                                        </div>
+                                        <div class="gate-time">
+                                            <span class="time-val" id="gate-time-D">5 min</span> wait
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Transit & Sustainability Board -->
+                        <div class="grid-row-double">
+                            <!-- Transit Panel -->
+                            <div class="card glassmorphic">
+                                <div class="card-header">
+                                    <h4><i class="fa-solid fa-train-subway text-secondary"></i> Smart Transit Board</h4>
+                                    <span class="refresh-indicator"><span class="pulse-dot animate-flicker"></span> Live Transit Sync</span>
+                                </div>
+                                <div class="card-body">
+                                    <div class="transit-board">
+                                        <div class="transit-item">
+                                            <div class="transit-route">
+                                                <span class="transit-icon rail"><i class="fa-solid fa-train"></i></span>
+                                                <div>
+                                                    <span class="route-name">Express Line 1 (Subway)</span>
+                                                    <span class="route-desc">To Downtown / Fan Zone</span>
+                                                </div>
+                                            </div>
+                                            <div class="transit-time text-success">4 mins <span class="boarding">Boarding</span></div>
+                                        </div>
+                                        <div class="transit-item">
+                                            <div class="transit-route">
+                                                <span class="transit-icon bus"><i class="fa-solid fa-bus"></i></span>
+                                                <div>
+                                                    <span class="route-name">Shuttle Bus 12B</span>
+                                                    <span class="route-desc">To Public Park & Ride</span>
+                                                </div>
+                                            </div>
+                                            <div class="transit-time text-warning">12 mins</div>
+                                        </div>
+                                        <div class="transit-item">
+                                            <div class="transit-route">
+                                                <span class="transit-icon rideshare"><i class="fa-solid fa-car"></i></span>
+                                                <div>
+                                                    <span class="route-name">Ride-Share Lot C</span>
+                                                    <span class="route-desc">High Demand / Traffic Delay</span>
+                                                </div>
+                                            </div>
+                                            <div class="transit-time text-danger">25 min delay</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sustainability Panel -->
+                            <div class="card glassmorphic">
+                                <div class="card-header">
+                                    <h4><i class="fa-solid fa-seedling text-success"></i> Eco-Green Fan Hub</h4>
+                                    <div class="points-badge"><i class="fa-solid fa-award"></i> <span id="fan-eco-points">350</span> Pts</div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="eco-metrics">
+                                        <div class="eco-metric-box">
+                                            <span class="eco-metric-val">1.2 kg</span>
+                                            <span class="eco-metric-lbl">Your Carbon Offset</span>
+                                        </div>
+                                        <div class="eco-metric-box">
+                                            <span class="eco-metric-val">4</span>
+                                            <span class="eco-metric-lbl">Recycled Items</span>
+                                        </div>
+                                    </div>
+                                    <div class="eco-action-box">
+                                        <p class="eco-tip"><strong>Tip:</strong> Return your souvenir cup to the recycling bins at Gate C and scan the QR code to earn 150 points!</p>
+                                        <button class="btn btn-outline btn-sm btn-success" id="btn-recycle-simulate">
+                                            <i class="fa-solid fa-qrcode"></i> Scan Recycling Bin
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    
+                    <!-- Right Side: GenAI Multilingual Fan Assistant -->
+                    <div class="grid-col-right">
+                        <div class="card glassmorphic chat-card">
+                            <div class="card-header">
+                                <div class="chat-title">
+                                    <div class="avatar-glow">
+                                        <i class="fa-solid fa-robot"></i>
+                                    </div>
+                                    <div>
+                                        <h3>GenAI Fan Assistant</h3>
+                                        <span class="chat-status">Online • Multi-language AI Support</span>
+                                    </div>
+                                </div>
+                                <div class="language-selector">
+                                    <select id="chat-lang-select" class="lang-select">
+                                        <option value="en">🇺🇸 English</option>
+                                        <option value="es">🇲🇽 Español</option>
+                                        <option value="fr">🇨🇦 Français</option>
+                                        <option value="pt"> Brazil Português</option>
+                                        <option value="de">🇩🇪 Deutsch</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <!-- Chat Area -->
+                            <div class="chat-messages-container" id="chat-messages">
+                                <!-- Default Welcome Message -->
+                                <div class="chat-message assistant">
+                                    <div class="message-content">
+                                        Welcome to Aztec Stadium! I am your FIFA 2026 Generative AI Assistant. I can translate in real-time and help you with accessibility routes, gate queue alerts, food ordering, and public transit scheduling.
+                                        <br><br>
+                                        How can I assist you today?
+                                    </div>
+                                    <div class="message-time">22:40</div>
+                                </div>
+                            </div>
+
+                            <!-- Preset Questions -->
+                            <div class="chat-presets">
+                                <button class="preset-btn" data-query="Where is the nearest wheelchair access route?">♿ Accessibility Routes</button>
+                                <button class="preset-btn" data-query="Which stadium gate is least crowded right now?">🚪 Least Crowded Gate</button>
+                                <button class="preset-btn" data-query="How do I get to downtown using public transit after the match?">🚇 Transit to Downtown</button>
+                                <button class="preset-btn" data-query="Can I order vegan food nearby?">🌱 Vegan Food</button>
+                            </div>
+
+                            <!-- Chat Input -->
+                            <div class="chat-input-area">
+                                <div class="typing-indicator hidden" id="chat-typing">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    AI is translating & thinking...
+                                </div>
+                                <form id="chat-form" class="chat-form">
+                                    <input type="text" id="chat-input" placeholder="Ask about gates, accessibility, food, transit..." autocomplete="off" required>
+                                    <button type="submit" class="btn-send">
+                                        <i class="fa-solid fa-paper-plane"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- ================= OPERATIONS COMMAND VIEW ================= -->
+            <section id="view-ops" class="view-section">
+                
+                <!-- KPI Dashboard Counters -->
+                <div class="ops-kpi-row">
+                    <div class="kpi-card glassmorphic border-primary">
+                        <div class="kpi-icon text-primary"><i class="fa-solid fa-users-viewfinder"></i></div>
+                        <div class="kpi-details">
+                            <span class="kpi-title">Crowd Density Index</span>
+                            <span class="kpi-value" id="kpi-crowd-density">68%</span>
+                            <span class="kpi-trend text-success"><i class="fa-solid fa-arrow-down"></i> -3% in last 10m</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card glassmorphic border-warning">
+                        <div class="kpi-icon text-warning"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <div class="kpi-details">
+                            <span class="kpi-title">Active Incidents</span>
+                            <span class="kpi-value" id="kpi-incidents-count">2</span>
+                            <span class="kpi-trend text-warning"><span class="pulse-dot warning animate-flicker"></span> 1 High Priority</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card glassmorphic border-info">
+                        <div class="kpi-icon text-info"><i class="fa-solid fa-train"></i></div>
+                        <div class="kpi-details">
+                            <span class="kpi-title">Transit Evacuation Flow</span>
+                            <span class="kpi-value">Optimum</span>
+                            <span class="kpi-trend text-success"><i class="fa-solid fa-check"></i> 8,400 pax/hr rate</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card glassmorphic border-success">
+                        <div class="kpi-icon text-success"><i class="fa-solid fa-recycle"></i></div>
+                        <div class="kpi-details">
+                            <span class="kpi-title">Stadium Waste Sorted</span>
+                            <span class="kpi-value">14.2 Tons</span>
+                            <span class="kpi-trend text-success"><i class="fa-solid fa-arrow-up"></i> +1.8T vs Target</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="view-grid">
+                    
+                    <!-- Left: Control Map & Incident Triage Console -->
+                    <div class="grid-col-left">
+                        
+                        <!-- Map Queue Simulation Controls -->
+                        <div class="card glassmorphic">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-sliders text-primary"></i> Real-time Queue & Bottleneck Simulation</h3>
+                                <span class="badge badge-outline">Live Feed Controls</span>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-info">Toggle simulator events to observe how the AI operations model redirects volunteers and suggests crowd dispersal pathways.</p>
+                                <div class="simulation-actions-grid">
+                                    <button class="btn btn-outline btn-warning" id="sim-btn-gate-b-surge">
+                                        <i class="fa-solid fa-users-line"></i> Simulate Gate B Surges (Bottleneck)
+                                    </button>
+                                    <button class="btn btn-outline btn-danger" id="sim-btn-medical">
+                                        <i class="fa-solid fa-heart-pulse"></i> Medical Alert (Aisle 108)
+                                    </button>
+                                    <button class="btn btn-outline btn-info" id="sim-btn-transit-delay">
+                                        <i class="fa-solid fa-train-subway"></i> Subway Delay Announcement
+                                    </button>
+                                    <button class="btn btn-outline btn-secondary" id="sim-btn-reset">
+                                        <i class="fa-solid fa-rotate-left"></i> Reset Stadium States
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- GenAI Smart Incident Triage -->
+                        <div class="card glassmorphic">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-brain text-primary"></i> GenAI Incident Triage & Dispatch</h3>
+                                <span class="badge badge-primary">Operations Intelligence</span>
+                            </div>
+                            <div class="card-body">
+                                <form id="incident-form" class="incident-input-group">
+                                    <label for="incident-input" class="form-label">Report Incident (Natural Language Input):</label>
+                                    <div class="input-with-action">
+                                        <input type="text" id="incident-input" placeholder="e.g., Spill detected at Sector East concourse close to Restroom 2..." required>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fa-solid fa-bolt"></i> Triage
+                                        </button>
+                                    </div>
+                                    <span class="input-hint">GenAI will auto-determine severity, assign a staff team, and format a checklist.</span>
+                                </form>
+
+                                <!-- Live Triage Output -->
+                                <div id="triage-output-container" class="triage-output-container hidden">
+                                    <div class="triage-header">
+                                        <div class="triage-title">
+                                            <i class="fa-solid fa-microchip-ai text-primary"></i>
+                                            <h5>GenAI Decision Support Analysis</h5>
+                                        </div>
+                                        <span class="badge" id="triage-badge-severity">HIGH</span>
+                                    </div>
+                                    <div class="triage-body">
+                                        <div class="triage-data-row">
+                                            <strong>Category:</strong> <span id="triage-val-category">Safety</span>
+                                        </div>
+                                        <div class="triage-data-row">
+                                            <strong>Assigned Resource:</strong> <span id="triage-val-squad">Squad 6 (Medical & First Aid)</span>
+                                        </div>
+                                        <div class="triage-data-row flex-column">
+                                            <strong>AI-Recommended Action Steps:</strong>
+                                            <ul class="triage-checklist" id="triage-val-steps">
+                                                <li>Deploy response team immediately</li>
+                                                <li>Notify gate operators</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Current Incidents List -->
+                                <h5 class="incidents-list-heading"><i class="fa-solid fa-list-check text-secondary"></i> Active Incidents Queue</h5>
+                                <div class="incidents-list" id="incidents-list">
+                                    <!-- Incidents injected by JS -->
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Right: Broadcast Center & Volunteer Tracker -->
+                    <div class="grid-col-right">
+                        
+                        <!-- GenAI Broadcast Center -->
+                        <div class="card glassmorphic">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-bullhorn text-secondary"></i> GenAI Multi-lingual Broadcast Generator</h3>
+                                <span class="badge badge-success">Emergency & Info Broadcasts</span>
+                            </div>
+                            <div class="card-body">
+                                <form id="broadcast-form" class="broadcast-input-group">
+                                    <label for="broadcast-prompt" class="form-label font-sm">Enter Broadcast Objective (English):</label>
+                                    <textarea id="broadcast-prompt" rows="3" placeholder="e.g. Notify fans at Gate B that Gate A is empty and has a 2-minute wait, please redirect." required></textarea>
+                                    <button type="submit" class="btn btn-secondary btn-block">
+                                        <i class="fa-solid fa-gears"></i> Generate Multilingual Broadcasts
+                                    </button>
+                                </form>
+
+                                <!-- AI Output Translations -->
+                                <div id="broadcast-output" class="broadcast-output hidden">
+                                    <div class="broadcast-wave" id="broadcast-wave">
+                                        <div class="wave-bar"></div>
+                                        <div class="wave-bar"></div>
+                                        <div class="wave-bar"></div>
+                                        <div class="wave-bar"></div>
+                                        <div class="wave-bar"></div>
+                                        <span class="wave-text font-xs">Translating Audio Prompts</span>
+                                    </div>
+
+                                    <div class="broadcast-tabs">
+                                        <div class="broadcast-lang-block">
+                                            <div class="lang-label">🇺🇸 English Broadcast Text</div>
+                                            <div class="lang-text" id="broadcast-txt-en">Gate B is currently experiencing heavy volume. Please redirect to Gate A which is clear and has a wait under 2 minutes.</div>
+                                            <button class="btn btn-xs btn-outline btn-audio" data-lang="en"><i class="fa-solid fa-volume-high"></i> Play Announcement</button>
+                                        </div>
+                                        <div class="broadcast-lang-block">
+                                            <div class="lang-label">🇲🇽 Español (Spanish Translation)</div>
+                                            <div class="lang-text" id="broadcast-txt-es">La puerta B tiene un volumen alto. Por favor diríjase a la puerta A, que está libre y tiene una espera de menos de 2 minutos.</div>
+                                            <button class="btn btn-xs btn-outline btn-audio" data-lang="es"><i class="fa-solid fa-volume-high"></i> Reproducir</button>
+                                        </div>
+                                        <div class="broadcast-lang-block">
+                                            <div class="lang-label">🇨🇦 Français (French Translation)</div>
+                                            <div class="lang-text" id="broadcast-txt-fr">La porte B est très encombrée. Veuillez vous rediriger vers la porte A, qui est libre et a une attente de moins de 2 minutes.</div>
+                                            <button class="btn btn-xs btn-outline btn-audio" data-lang="fr"><i class="fa-solid fa-volume-high"></i> Écouter</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Volunteer Squad Tracker -->
+                        <div class="card glassmorphic">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-people-carry-box text-success"></i> Volunteer & Staff Dispatch</h3>
+                                <div class="volunteer-counts">
+                                    <span class="badge badge-success"><span class="badge-dot dot-success animate-flicker"></span> 18 Avail</span>
+                                    <span class="badge badge-warning"><span class="badge-dot dot-warning animate-flicker"></span> 4 Active</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="squad-list" id="squad-list">
+                                    <!-- Squads list will be rendered dynamically -->
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </section>
+
+        </main>
+        
+        <!-- Footer -->
+        <footer class="app-footer">
+            <div class="footer-left">
+                <p>&copy; 2026 FIFA World Cup Stadium Operations Platform. All rights reserved.</p>
+            </div>
+            <div class="footer-right">
+                <span><i class="fa-solid fa-shield-halved text-success"></i> Secure Channel</span>
+                <span>•</span>
+                <span>v1.0.4-live</span>
+            </div>
+        </footer>
+
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

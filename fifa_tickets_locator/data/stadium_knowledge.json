@@ -1,0 +1,50 @@
+[
+  {
+    "id": "kb-access",
+    "title": "Stadium Gate & Sector Access",
+    "keywords": ["gate", "sector", "entrance", "access", "north", "south", "east", "west"],
+    "content": "Azteca & MetLife Stadiums are split into 4 major sectors: Sector North (accessed via Gate A), Sector East (accessed via Gate B), Sector South (accessed via Gate C), and Sector West (accessed via Gate D). Ticket holders must enter through their designated gate printed on the digital pass. Scanning opens 3 hours prior to kickoff."
+  },
+  {
+    "id": "kb-restrooms",
+    "title": "Restroom & Toilet Locations",
+    "keywords": ["toilet", "restroom", "washroom", "bath", "wc", "diaper", "baby"],
+    "content": "Restrooms are located behind Sector East (Section 114) and Sector West (Section 132). General multi-stall washrooms are positioned near every major Gate entrance (Gates A, B, C, D). Family-friendly and gender-neutral restrooms equipped with baby-changing tables are available behind Section 114."
+  },
+  {
+    "id": "kb-concessions",
+    "title": "Food & Beverage Concessions",
+    "keywords": ["food", "concession", "eat", "drink", "beer", "soda", "vegan", "taco", "pizza", "pretzel", "hotdog"],
+    "content": "Food concourses vary by sector:\n- Sector North Concourse: Features Pizza & Beverage outlets.\n- Sector East Concourse: Features Mexican taco stands and craft beers.\n- Sector South Concourse: Features vegan options, salad counters, and warm pretzel outlets.\n- Sector West Concourse: Features classic hot dogs, nachos, and generic soda bars."
+  },
+  {
+    "id": "kb-accessibility",
+    "title": "Accessibility & Elevators",
+    "keywords": ["wheelchair", "elevator", "disable", "accessibility", "escalator", "handicap", "escort"],
+    "content": "Accessible elevators are positioned directly adjacent to Gate D (West) and Gate A (North) entrances. These elevators travel straight to Club level and Upper Deck rows. Volunteer escorts are stationed at every gate to provide wheelchair assistance and escort services to your exact seat."
+  },
+  {
+    "id": "kb-medical",
+    "title": "Medical Bays & Emergency First Aid",
+    "keywords": ["medical", "first aid", "emergency", "doctor", "health", "hospital", "injury", "sick"],
+    "content": "Medical bays and first aid treatment clinics are located behind Sector South (adjacent to Section 122) and near the main Gate A entrance. Doctors and EMT volunteers are active. If an emergency occurs in the stands, alert the nearest volunteer squad immediately."
+  },
+  {
+    "id": "kb-security",
+    "title": "Bag Policy & Security Regulations",
+    "keywords": ["bag", "backpack", "purse", "security", "prohibit", "forbidden", "size", "clear", "flare", "bottle", "camera"],
+    "content": "Stadium security enforces a strict clear-bag policy. Bags must be clear plastic, vinyl, or PVC and not exceed 12x6x12 inches. Small clutch purses (under 4.5x6.5 inches) are allowed. Forbidden items include weapons, flares, thermoses, glass bottles, umbrellas, professional cameras, and large banners."
+  },
+  {
+    "id": "kb-transport",
+    "title": "Transportation & Transit Connections",
+    "keywords": ["transport", "transit", "metro", "bus", "shuttle", "parking", "uber", "taxi", "train"],
+    "content": "Transit options:\n- Metro Line: Connects directly to the Gate A (North) station platform.\n- Shuttle Buses: Operate continuously from the Gate C (South) parking lots to nearby hubs.\n- Taxi & Rideshare (Uber/Lyft): Drop-off and pick-up zones are located at Gate D (West) parking lot 4."
+  },
+  {
+    "id": "kb-ticketing",
+    "title": "Ticketing & Re-entry Policies",
+    "keywords": ["ticket", "re-entry", "exit", "refund", "child", "age", "barcode", "serial"],
+    "content": "Tickets are strictly digital and must be scanned from your app wallet. Re-entry is not permitted under any circumstances; once your ticket is scanned out, it is invalidated. Children under 2 years of age do not require a ticket, provided they sit on an adult's lap. Refunds are not permitted."
+  }
+]

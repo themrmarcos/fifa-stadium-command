@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: fifa-backend-api
+    env: node
+    plan: free
+    buildCommand: cd fifa_tickets_locator && npm install
+    startCommand: cd fifa_tickets_locator && node server.js
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: PORT
+        value: 10000
+
+  - type: web
+    name: fifa-organizer-dashboard
+    env: static
+    plan: free
+    buildCommand: cd fifa_organizer_dashboard && npm install && npm run build
+    publishPath: fifa_organizer_dashboard/dist

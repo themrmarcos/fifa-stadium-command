@@ -1,0 +1,121 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-volume-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fifa-backend
+  labels:
+    app: fifa-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fifa-backend
+  template:
+    metadata:
+      labels:
+        app: fifa-backend
+    spec:
+      containers:
+        - name: backend
+          image: fifa-tickets-backend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - name: GEMINI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: gemini-secrets
+                  key: api-key
+          volumeMounts:
+            - name: db-persistent-storage
+              mountPath: /usr/src/app/data
+      volumes:
+        - name: db-persistent-storage
+          persistentVolumeClaim:
+            claimName: db-volume-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fifa-backend-service
+spec:
+  type: ClusterIP
+  selector:
+    app: fifa-backend
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fifa-dashboard
+  labels:
+    app: fifa-dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fifa-dashboard
+  template:
+    metadata:
+      labels:
+        app: fifa-dashboard
+    spec:
+      containers:
+        - name: dashboard
+          image: fifa-organizer-dashboard:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fifa-dashboard-service
+spec:
+  type: ClusterIP
+  selector:
+    app: fifa-dashboard
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fifa-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /api/(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: fifa-backend-service
+                port:
+                  number: 8000
+          - path: /(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: fifa-dashboard-service
+                port:
+                  number: 3000

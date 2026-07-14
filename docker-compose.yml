@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./fifa_tickets_locator
+      dockerfile: Dockerfile
+    container_name: fifa-backend-service
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./fifa_tickets_locator/data:/usr/src/app/data
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    restart: always
+
+  dashboard:
+    build:
+      context: ./fifa_organizer_dashboard
+      dockerfile: Dockerfile
+    container_name: fifa-organizer-dashboard
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: always
