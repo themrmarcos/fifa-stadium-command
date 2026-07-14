@@ -79,7 +79,7 @@ Assert-Test "POST /api/tickets/verify - Verify valid serial" {
 Assert-Test "POST /api/tickets/verify - Fail on invalid serial" {
     try {
         $body = @{ serial = "FIFA-INVALID-SERIAL" } | ConvertTo-Json -Compress
-        $res = Invoke-WebRequest -Uri "$baseUrl/api/tickets/verify" -Method Post -Body $body -ContentType "application/json"
+        $res = Invoke-WebRequest -UseBasicParsing -Uri "$baseUrl/api/tickets/verify" -Method Post -Body $body -ContentType "application/json"
         return $false
     } catch {
         # Expecting 404 status
@@ -133,6 +133,34 @@ Assert-Test "POST /api/admin/simulate - Trigger congestion bottleneck simulation
     $body = @{ type = "congestion" } | ConvertTo-Json -Compress
     $res = Invoke-RestMethod -Uri "$baseUrl/api/admin/simulate" -Method Post -Body $body -ContentType "application/json"
     return ($res.category -eq "Crowd Congestion" -and $res.status -eq "ACTIVE")
+}
+
+# 10. Security Headers Verification
+Assert-Test "Security Headers - Verify CSP, X-Frame-Options, and nosniff" {
+    $res = Invoke-WebRequest -UseBasicParsing -Uri "$baseUrl/api/matches" -Method Get
+    $csp = $res.Headers["Content-Security-Policy"]
+    $frame = $res.Headers["X-Frame-Options"]
+    $nosniff = $res.Headers["X-Content-Type-Options"]
+    return ($null -ne $csp -and $frame -eq "DENY" -and $nosniff -eq "nosniff")
+}
+
+# 11. XSS Injection Defense check
+Assert-Test "XSS Prevention - Sanitize chatbot HTML/script tags" {
+    $body = @{ message = "<script>alert('xss')</script>Where are restrooms?" } | ConvertTo-Json -Compress
+    $res = Invoke-RestMethod -Uri "$baseUrl/api/chat" -Method Post -Body $body -ContentType "application/json"
+    return ($res.response.ToLower().Contains("restroom") -and -not $res.response.Contains("<script>"))
+}
+
+# 12. SQL/JSON Query Injection protection check
+Assert-Test "SQLi/Bypass Prevention - Strip malicious verify serial codes" {
+    $body = @{ serial = "' OR '1'='1" } | ConvertTo-Json -Compress
+    try {
+        $res = Invoke-WebRequest -UseBasicParsing -Uri "$baseUrl/api/tickets/verify" -Method Post -Body $body -ContentType "application/json"
+        return $false
+    } catch {
+        $status = $_.Exception.Response.StatusCode
+        return ($status -eq "NotFound")
+    }
 }
 
 Write-Host ""

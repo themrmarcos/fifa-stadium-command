@@ -95,6 +95,12 @@ try {
         $response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         $response.Headers.Add("Access-Control-Allow-Headers", "Content-Type")
 
+        # Add HTTP Security Headers
+        $response.Headers.Add("X-Frame-Options", "DENY")
+        $response.Headers.Add("X-Content-Type-Options", "nosniff")
+        $response.Headers.Add("X-XSS-Protection", "1; mode=block")
+        $response.Headers.Add("Content-Security-Policy", "default-src 'self' http: https: data: 'unsafe-inline' 'unsafe-eval'")
+
         # Handle Preflight OPTIONS
         if ($method -eq "OPTIONS") {
             $response.StatusCode = 200
@@ -215,6 +221,10 @@ try {
                 
                 $verifyReq = ConvertFrom-Json $body
                 $serial = $verifyReq.serial
+                if ($null -ne $serial) {
+                    # Strip any non-alphanumeric and non-hyphen characters to prevent JSON/SQLi injections
+                    $serial = $serial -replace '[^A-Za-z0-9\-]', ''
+                }
                 $ticket = $dbContent.bookedTickets | Where-Object { $_.serial.ToLower() -eq $serial.ToLower() }
 
                 if ($null -ne $ticket) {
@@ -246,6 +256,11 @@ try {
 
                 $chatReq = ConvertFrom-Json $body
                 $message = $chatReq.message
+                if ($null -ne $message) {
+                    # Sanitize inputs by stripping out XSS script tags and HTML markup
+                    $message = $message -replace '<script[^>]*?>.*?</script>', ''
+                    $message = $message -replace '<[^>]*?>', ''
+                }
                 Write-Host "RAG chat received: '$message'"
 
                 # 1. Retrieve relevant facts (RAG)

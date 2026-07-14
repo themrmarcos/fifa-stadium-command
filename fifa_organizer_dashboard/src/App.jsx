@@ -186,10 +186,12 @@ function App() {
       <div style={{ display: 'flex', flex: 1 }}>
         
         {/* Sidebar */}
-        <aside className="glass-panel" style={{ width: 220, padding: 20, display: 'flex', flexDirection: 'column', gap: 8, borderRight: '1px solid rgba(30, 45, 74, 0.5)' }}>
+        <aside className="glass-panel" role="tablist" aria-label="Operations Tab List" style={{ width: 220, padding: 20, display: 'flex', flexDirection: 'column', gap: 8, borderRight: '1px solid rgba(30, 45, 74, 0.5)' }}>
           <button 
             onClick={() => setActiveTab('overview')} 
             className="glass-card"
+            role="tab"
+            aria-selected={activeTab === 'overview'}
             style={{ 
               display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', border: 'none', borderRadius: 8, textAlign: 'left', cursor: 'pointer',
               color: activeTab === 'overview' ? '#FFE259' : 'white', width: '100%', fontWeight: 600,
@@ -201,6 +203,8 @@ function App() {
           <button 
             onClick={() => setActiveTab('incidents')} 
             className="glass-card"
+            role="tab"
+            aria-selected={activeTab === 'incidents'}
             style={{ 
               display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', border: 'none', borderRadius: 8, textAlign: 'left', cursor: 'pointer',
               color: activeTab === 'incidents' ? '#FFE259' : 'white', width: '100%', fontWeight: 600,
@@ -212,6 +216,8 @@ function App() {
           <button 
             onClick={() => setActiveTab('scanner')} 
             className="glass-card"
+            role="tab"
+            aria-selected={activeTab === 'scanner'}
             style={{ 
               display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', border: 'none', borderRadius: 8, textAlign: 'left', cursor: 'pointer',
               color: activeTab === 'scanner' ? '#FFE259' : 'white', width: '100%', fontWeight: 600,
@@ -223,6 +229,8 @@ function App() {
           <button 
             onClick={() => setActiveTab('simulate')} 
             className="glass-card"
+            role="tab"
+            aria-selected={activeTab === 'simulate'}
             style={{ 
               display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', border: 'none', borderRadius: 8, textAlign: 'left', cursor: 'pointer',
               color: activeTab === 'simulate' ? '#FFE259' : 'white', width: '100%', fontWeight: 600,

@@ -10,6 +10,16 @@ const DB_PATH = path.join(__dirname, 'data', 'db.json');
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Security Headers Middleware
+app.use((req, res, next) => {
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Content-Security-Policy', "default-src 'self' http: https: data: 'unsafe-inline' 'unsafe-eval'");
+    next();
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Helper functions for reading/writing DB
@@ -119,11 +129,14 @@ app.post('/api/bookings', (req, res) => {
 
 // 4. Verify a ticket by serial number
 app.post('/api/tickets/verify', (req, res) => {
-    const { serial } = req.body;
+    let { serial } = req.body;
     
     if (!serial) {
         return res.status(400).json({ error: 'Serial number is required.' });
     }
+
+    // Strip any non-alphanumeric and non-hyphen characters to prevent JSON/SQLi injections
+    serial = String(serial).replace(/[^A-Za-z0-9\-]/g, '');
 
     const db = readDB();
     const ticket = db.bookedTickets.find(t => t.serial.toLowerCase() === serial.toLowerCase());
@@ -177,12 +190,16 @@ function getRelevantContext(query) {
     }
 }
 
-// 5. Intelligent Assistant Chat Endpoint
 app.post('/api/chat', async (req, res) => {
-    const { message } = req.body;
+    let { message } = req.body;
     if (!message) {
         return res.status(400).json({ error: 'Message content is required.' });
     }
+
+    // Sanitize message to prevent XSS script injection and HTML tag insertion
+    message = String(message)
+        .replace(/<script[^>]*?>[\s\S]*?<\/script>/gi, '')
+        .replace(/<[^>]*?>/g, '');
 
     const contextChunks = getRelevantContext(message);
     let retrievedText = '';

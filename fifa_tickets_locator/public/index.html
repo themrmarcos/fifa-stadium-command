@@ -43,14 +43,14 @@
 
             <!-- Main Navigation Tabs -->
             <div class="header-center">
-                <div class="nav-tabs">
-                    <button class="tab-btn active" data-tab="booking">
+                <div class="nav-tabs" role="tablist" aria-label="Main Navigation Tabs">
+                    <button class="tab-btn active" data-tab="booking" role="tab" aria-selected="true" aria-controls="tab-booking">
                         <i class="fa-solid fa-ticket-simple"></i> Book Tickets
                     </button>
-                    <button class="tab-btn" id="nav-btn-tickets" data-tab="tickets">
-                        <i class="fa-solid fa-wallet"></i> My Tickets <span class="tab-badge" id="tickets-count-badge">0</span>
+                    <button class="tab-btn" id="nav-btn-tickets" data-tab="tickets" role="tab" aria-selected="false" aria-controls="tab-tickets">
+                        <i class="fa-solid fa-wallet"></i> My Tickets <span class="tab-badge" id="tickets-count-badge" aria-label="0 tickets booked">0</span>
                     </button>
-                    <button class="tab-btn" id="nav-btn-pathfinder" data-tab="pathfinder">
+                    <button class="tab-btn" id="nav-btn-pathfinder" data-tab="pathfinder" role="tab" aria-selected="false" aria-controls="tab-pathfinder">
                         <i class="fa-solid fa-map-location-dot"></i> Seat Pathfinder
                     </button>
                 </div>
@@ -72,7 +72,7 @@
         <main class="main-workspace">
 
             <!-- ================= BOOKING TAB ================= -->
-            <section id="tab-booking" class="tab-section active">
+            <section id="tab-booking" class="tab-section active" role="tabpanel" aria-labelledby="nav-btn-booking">
                 <div class="section-title-bar">
                     <h2>Select a FIFA World Cup 2026™ Match</h2>
                     <p class="section-desc">Select an upcoming tournament match, choose your ticket level, and generate your interactive smart ticket.</p>
@@ -181,7 +181,7 @@
             </section>
 
             <!-- ================= MY TICKETS WALLET ================= -->
-            <section id="tab-tickets" class="tab-section">
+            <section id="tab-tickets" class="tab-section" role="tabpanel" aria-labelledby="nav-btn-tickets">
                 <div class="section-title-bar">
                     <h2>My FIFA Ticket Wallet</h2>
                     <p class="section-desc">Manage your booked match tickets, generate digital smart passes, and simulate entrance scan credentials.</p>
@@ -329,7 +329,7 @@
             </section>
 
             <!-- ================= SEAT PATHFINDER TAB ================= -->
-            <section id="tab-pathfinder" class="tab-section">
+            <section id="tab-pathfinder" class="tab-section" role="tabpanel" aria-labelledby="nav-btn-pathfinder">
                 <div class="section-title-bar">
                     <h2>Interactive Seating Pathfinder</h2>
                     <p class="section-desc">Locate your exact seating section and view an animated route layout from the stadium gates to your row.</p>
